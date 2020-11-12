@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       PROPERTIES_PATH: gradle.properties
 
@@ -40,10 +40,15 @@ jobs:
       with:
         path: ${{ env.PROPERTIES_PATH }}
         property: version
-    - name: Build with Gradle
-      run: ./gradlew build
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+    - run: ./gradlew build
     - name: Upload
       uses: actions/upload-artifact@v2
       with:
-       name: Frozen Scythe 
+       name: Beta Version (Unstable)
        path: build/libs
